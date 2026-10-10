@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { ConcertEvent } from '@/lib/types';
 import { GENRE_METADATA } from '@/lib/constants';
-import L from 'leaflet';
+import type L from 'leaflet';
 
 interface VenueMapProps {
   concerts: ConcertEvent[];
@@ -23,117 +23,129 @@ export default function VenueMap({
   const markersRef = useRef<{ [id: string]: L.Marker }>({});
 
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapContainerRef.current || typeof window === 'undefined') return;
 
-    if (!mapInstanceRef.current) {
-      // Default to central view with performance options
-      const map = L.map(mapContainerRef.current, {
-        center: [40.7128, -74.006],
-        zoom: 11,
-        zoomControl: false,
-        attributionControl: true,
-        scrollWheelZoom: false, // Prevent hijacking scroll wheel
-        preferCanvas: true      // Render on Canvas instead of heavy DOM nodes
-      });
+    let isCancelled = false;
 
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
+    const setupMap = async () => {
+      // Dynamic import to prevent "window is not defined" in Node/SSR/Vercel
+      const leafletModule = await import('leaflet');
+      const L = leafletModule.default || leafletModule;
 
-      // OpenStreetMap Humanitarian Tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+      if (isCancelled || !mapContainerRef.current) return;
 
-      mapInstanceRef.current = map;
-    }
+      if (!mapInstanceRef.current) {
+        const map = L.map(mapContainerRef.current, {
+          center: [40.7128, -74.006],
+          zoom: 11,
+          zoomControl: false,
+          attributionControl: true,
+          scrollWheelZoom: false,
+          preferCanvas: true
+        });
 
-    const map = mapInstanceRef.current;
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Clear existing markers
-    Object.values(markersRef.current).forEach((m) => m.remove());
-    markersRef.current = {};
+        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    // Custom Neon Stage Pin Creator (Optimized CSS, no infinite ping loops)
-    const createStageIcon = (concert: ConcertEvent, isSelected: boolean) => {
-      const meta = GENRE_METADATA[concert.genre] || GENRE_METADATA.all;
-      const color = isSelected ? '#ffffff' : meta.color;
-      const ring = isSelected ? 'border: 2px solid #ffffff; box-shadow: 0 0 16px #c084fc;' : `border: 2px solid ${meta.color};`;
+        mapInstanceRef.current = map;
+      }
 
-      const html = `
-        <div style="position: relative; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
-          ${isSelected ? `<span style="position: absolute; inset: -4px; border-radius: 9999px; border: 2px solid ${meta.color}; opacity: 0.85;"></span>` : ''}
-          <div style="
-            position: relative;
-            width: 30px;
-            height: 30px;
-            border-radius: 9999px;
-            background: #0f1019;
-            ${ring}
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: ${color};
-            font-size: 13px;
-            font-weight: 900;
-          ">
-            🎵
+      const map = mapInstanceRef.current;
+
+      // Clear existing markers
+      Object.values(markersRef.current).forEach((m) => m.remove());
+      markersRef.current = {};
+
+      const createStageIcon = (concert: ConcertEvent, isSelected: boolean) => {
+        const meta = GENRE_METADATA[concert.genre] || GENRE_METADATA.all;
+        const color = isSelected ? '#ffffff' : meta.color;
+        const ring = isSelected ? 'border: 2px solid #ffffff; box-shadow: 0 0 16px #c084fc;' : `border: 2px solid ${meta.color};`;
+
+        const html = `
+          <div style="position: relative; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
+            ${isSelected ? `<span style="position: absolute; inset: -4px; border-radius: 9999px; border: 2px solid ${meta.color}; opacity: 0.85;"></span>` : ''}
+            <div style="
+              position: relative;
+              width: 30px;
+              height: 30px;
+              border-radius: 9999px;
+              background: #0f1019;
+              ${ring}
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: ${color};
+              font-size: 13px;
+              font-weight: 900;
+            ">
+              🎵
+            </div>
           </div>
-        </div>
-      `;
+        `;
 
-      return L.divIcon({
-        html,
-        className: 'custom-stage-pin',
-        iconSize: [34, 34],
-        iconAnchor: [17, 17],
-        popupAnchor: [0, -17]
+        return L.divIcon({
+          html,
+          className: 'custom-stage-pin',
+          iconSize: [34, 34],
+          iconAnchor: [17, 17],
+          popupAnchor: [0, -17]
+        });
+      };
+
+      // Add markers for all visible concerts
+      concerts.forEach((c) => {
+        const isSelected = c.id === selectedConcertId;
+        const marker = L.marker([c.lat, c.lng], {
+          icon: createStageIcon(c, isSelected)
+        }).addTo(map);
+
+        const dateStr = new Date(c.date).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        });
+
+        const popupHtml = `
+          <div style="font-family: inherit; width: 190px; padding: 4px;">
+            <div style="font-size: 10px; font-weight: 800; color: #c084fc; text-transform: uppercase;">${c.genre} • ${dateStr}</div>
+            <div style="font-size: 13px; font-weight: 800; color: #ffffff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.artist}</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 1px;">${c.venue_name}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px solid #272a3d;">
+              <span style="font-weight: 800; color: #34d399; font-size: 13px;">From $${c.price_min}</span>
+              <span style="font-size: 10px; background: rgba(192, 132, 252, 0.2); color: #c084fc; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Explore</span>
+            </div>
+          </div>
+        `;
+
+        marker.bindPopup(popupHtml);
+        marker.on('click', () => {
+          onSelectConcert(c);
+        });
+
+        markersRef.current[c.id] = marker;
       });
+
+      // Auto fit or center on selected city/concert
+      if (selectedConcertId && markersRef.current[selectedConcertId]) {
+        const selected = concerts.find((c) => c.id === selectedConcertId);
+        if (selected) {
+          map.flyTo([selected.lat, selected.lng], 13, { duration: 0.8 });
+          markersRef.current[selectedConcertId].openPopup();
+        }
+      } else if (concerts.length > 0) {
+        const bounds = L.latLngBounds(concerts.map((c) => [c.lat, c.lng]));
+        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 });
+      }
     };
 
-    // Add markers for all visible concerts
-    concerts.forEach((c) => {
-      const isSelected = c.id === selectedConcertId;
-      const marker = L.marker([c.lat, c.lng], {
-        icon: createStageIcon(c, isSelected)
-      }).addTo(map);
+    setupMap();
 
-      // Popup Content
-      const dateStr = new Date(c.date).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric'
-      });
-
-      const popupHtml = `
-        <div style="font-family: inherit; width: 190px; padding: 4px;">
-          <div style="font-size: 10px; font-weight: 800; color: #c084fc; text-transform: uppercase;">${c.genre} • ${dateStr}</div>
-          <div style="font-size: 13px; font-weight: 800; color: #ffffff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.artist}</div>
-          <div style="font-size: 11px; color: #94a3b8; margin-top: 1px;">${c.venue_name}</div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px solid #272a3d;">
-            <span style="font-weight: 800; color: #34d399; font-size: 13px;">From $${c.price_min}</span>
-            <span style="font-size: 10px; background: rgba(192, 132, 252, 0.2); color: #c084fc; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Explore</span>
-          </div>
-        </div>
-      `;
-
-      marker.bindPopup(popupHtml);
-      marker.on('click', () => {
-        onSelectConcert(c);
-      });
-
-      markersRef.current[c.id] = marker;
-    });
-
-    // Auto fit or center on selected city/concert
-    if (selectedConcertId && markersRef.current[selectedConcertId]) {
-      const selected = concerts.find((c) => c.id === selectedConcertId);
-      if (selected) {
-        map.flyTo([selected.lat, selected.lng], 13, { duration: 0.8 });
-        markersRef.current[selectedConcertId].openPopup();
-      }
-    } else if (concerts.length > 0) {
-      const bounds = L.latLngBounds(concerts.map((c) => [c.lat, c.lng]));
-      map.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 });
-    }
+    return () => {
+      isCancelled = true;
+    };
   }, [concerts, selectedConcertId, onSelectConcert, selectedCity]);
 
   return (

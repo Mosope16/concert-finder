@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import 'leaflet/dist/leaflet.css';
 import ServiceWorkerRegistration from '@/components/service-worker-registration';
 
 export const metadata: Metadata = {
@@ -32,12 +33,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossOrigin=""
-        />
         <meta name="theme-color" content="#090a10" />
       </head>
       <body className="min-h-screen bg-[#090a10] text-slate-100 antialiased selection:bg-purple-500/30 selection:text-purple-200">

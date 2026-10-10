@@ -1,14 +1,11 @@
-const CACHE_NAME = 'concert-finder-v1';
-
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
-
+// Self-unregistering worker to clear any previously installed cache
+self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-  // Let network handle or fallback gracefully
+  event.waitUntil(
+    self.registration.unregister().then(() => {
+      return self.clients.matchAll();
+    }).then((clients) => {
+      clients.forEach((client) => client.navigate(client.url));
+    })
+  );
 });
