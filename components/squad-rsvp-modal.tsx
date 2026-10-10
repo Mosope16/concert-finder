@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ConcertEvent, UserRSVP } from '@/lib/types';
+import { ConcertEvent } from '@/lib/types';
 import { recordUserRSVP, getUserRSVPs } from '@/lib/storage';
-import { X, Users, CheckCircle2, PartyPopper, Ticket, Send } from 'lucide-react';
+import { X, Users, CheckCircle2, Send } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface SquadRsvpModalProps {
@@ -48,24 +48,34 @@ export default function SquadRsvpModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md rounded-3xl bg-[#0f111c] border border-stage-800 shadow-2xl text-slate-100 p-6 overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6 overflow-y-auto bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0f111c] border border-stage-800 shadow-2xl text-slate-100 p-4 sm:p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Mobile drag handle */}
+        <div className="w-12 h-1.5 rounded-full bg-slate-700 mx-auto mb-3 sm:hidden" />
+
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-stage-800">
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-stage-800">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400">
+            <div className="p-1.5 sm:p-2 rounded-xl bg-purple-500/20 text-purple-400">
               <Users className="w-4 h-4" />
             </div>
-            <div>
-              <h3 className="font-extrabold text-base text-white">Squad RSVP Planner</h3>
-              <p className="text-[11px] text-slate-400 truncate max-w-[240px]">
+            <div className="min-w-0">
+              <h3 className="font-extrabold text-sm sm:text-base text-white">Squad RSVP Planner</h3>
+              <p className="text-[10px] sm:text-[11px] text-slate-400 truncate max-w-[200px] sm:max-w-[260px]">
                 {concert.artist} @ {concert.venue_name}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-stage-800 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 sm:p-2 rounded-full hover:bg-stage-800 text-slate-400 hover:text-white transition-colors"
+            aria-label="Close modal"
           >
             <X className="w-4 h-4" />
           </button>
@@ -73,10 +83,10 @@ export default function SquadRsvpModal({
 
         {/* Content */}
         {!submitted ? (
-          <form onSubmit={handleSubmit} className="py-4 space-y-4 text-xs">
+          <form onSubmit={handleSubmit} className="py-3 sm:py-4 space-y-3 sm:space-y-4 text-xs">
             {/* Name Input */}
             <div>
-              <label className="block text-slate-300 font-bold mb-1.5">
+              <label className="block text-slate-300 font-bold mb-1.5 text-xs">
                 Your Name or Squad Handle
               </label>
               <input
@@ -85,20 +95,20 @@ export default function SquadRsvpModal({
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="e.g. Jordan & Chloe, Alex K."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-stage-900 border border-stage-800 text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-stage-900 border border-stage-800 text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500 transition-colors text-[16px] sm:text-xs"
               />
             </div>
 
             {/* Attendance Status */}
             <div>
-              <label className="block text-slate-300 font-bold mb-1.5">
+              <label className="block text-slate-300 font-bold mb-1.5 text-xs">
                 Attendance Plan
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setStatus('going')}
-                  className={`p-3 rounded-xl border text-center font-bold transition-all ${
+                  className={`p-2.5 sm:p-3 rounded-xl border text-center font-bold transition-all text-xs active:scale-95 ${
                     status === 'going'
                       ? 'bg-purple-600/20 border-purple-500 text-purple-300 shadow-glow'
                       : 'bg-stage-900 border-stage-800 text-slate-400 hover:text-white'
@@ -109,26 +119,26 @@ export default function SquadRsvpModal({
                 <button
                   type="button"
                   onClick={() => setStatus('interested')}
-                  className={`p-3 rounded-xl border text-center font-bold transition-all ${
+                  className={`p-2.5 sm:p-3 rounded-xl border text-center font-bold transition-all text-xs active:scale-95 ${
                     status === 'interested'
                       ? 'bg-cyan-600/20 border-cyan-500 text-cyan-300 shadow-glow-cyan'
                       : 'bg-stage-900 border-stage-800 text-slate-400 hover:text-white'
                   }`}
                 >
-                  👀 Interested / Looking
+                  👀 Interested
                 </button>
               </div>
             </div>
 
             {/* Preferred Ticket Tier */}
             <div>
-              <label className="block text-slate-300 font-bold mb-1.5">
+              <label className="block text-slate-300 font-bold mb-1.5 text-xs">
                 Target Seating Section
               </label>
               <select
                 value={ticketTier}
                 onChange={(e) => setTicketTier(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-stage-900 border border-stage-800 text-white focus:outline-none focus:border-purple-500 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-stage-900 border border-stage-800 text-white focus:outline-none focus:border-purple-500 cursor-pointer text-[16px] sm:text-xs"
               >
                 {concert.ticket_tiers.map((t) => (
                   <option key={t.id} value={t.name}>
@@ -141,14 +151,14 @@ export default function SquadRsvpModal({
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:brightness-110 text-white font-extrabold transition-all shadow-glow flex items-center justify-center gap-2 active:scale-95"
+              className="w-full py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm transition-all shadow-glow flex items-center justify-center gap-2 active:scale-95"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>Confirm Squad RSVP</span>
             </button>
           </form>
         ) : (
-          <div className="text-center py-6 space-y-3">
+          <div className="text-center py-5 sm:py-6 space-y-3">
             <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6" />
             </div>
@@ -158,7 +168,7 @@ export default function SquadRsvpModal({
             </p>
             <button
               onClick={onClose}
-              className="px-5 py-2 rounded-xl bg-stage-800 hover:bg-stage-700 text-white font-bold text-xs"
+              className="px-5 py-2.5 rounded-xl bg-stage-800 hover:bg-stage-700 text-white font-bold text-xs active:scale-95"
             >
               Done
             </button>
@@ -167,7 +177,7 @@ export default function SquadRsvpModal({
 
         {/* Recent Attendees List */}
         {existingRsvps.length > 0 && (
-          <div className="pt-4 border-t border-stage-800 mt-2 text-xs">
+          <div className="pt-3 sm:pt-4 border-t border-stage-800 mt-2 text-xs">
             <span className="text-[11px] font-bold text-slate-400 block mb-2">
               Recent RSVPs for this show ({existingRsvps.length}):
             </span>

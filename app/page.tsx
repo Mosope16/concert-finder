@@ -37,7 +37,7 @@ import {
 const VenueMap = dynamic(() => import('@/components/map/venue-map'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full min-h-[380px] rounded-3xl bg-stage-950 flex flex-col items-center justify-center text-slate-400 text-xs gap-3 border border-stage-800">
+    <div className="w-full h-full min-h-[320px] sm:min-h-[380px] rounded-3xl bg-stage-950 flex flex-col items-center justify-center text-slate-400 text-xs gap-3 border border-stage-800">
       <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
       <span>Loading Interactive Venue Radar...</span>
     </div>
@@ -254,28 +254,28 @@ export default function ConcertDashboard() {
 
       {/* Hero Tour Spotlight Banner */}
       {spotlightConcert && !showOnlySaved && !filters.searchQuery && (
-        <section className="relative w-full border-b border-stage-800 bg-gradient-to-b from-[#131524] to-[#090a10] overflow-hidden py-8 px-4 sm:px-6">
+        <section className="relative w-full border-b border-stage-800 bg-gradient-to-b from-[#131524] to-[#090a10] overflow-hidden py-6 sm:py-8 px-3.5 sm:px-6">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(192,132,252,0.15),transparent_50%)] pointer-events-none" />
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-            <div className="space-y-3 max-w-xl text-center md:text-left">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 relative z-10">
+            <div className="space-y-2.5 sm:space-y-3 max-w-xl text-center md:text-left">
+              <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/30">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
                 <span>Featured Global Headline Stop</span>
               </div>
-              <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+              <h2 className="text-2xl xs:text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
                 {spotlightConcert.artist}
               </h2>
-              <p className="text-sm sm:text-base font-semibold text-purple-300">
+              <p className="text-xs sm:text-base font-semibold text-purple-300">
                 {spotlightConcert.title} • {spotlightConcert.venue_name} ({spotlightConcert.city})
               </p>
-              <p className="text-xs text-slate-400 line-clamp-2">
+              <p className="text-[11px] sm:text-xs text-slate-400 line-clamp-2">
                 {spotlightConcert.description}
               </p>
 
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+              <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-2">
                 <button
                   onClick={() => handleSelectConcert(spotlightConcert)}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-extrabold text-xs shadow-glow hover:brightness-110 transition-all active:scale-95 flex items-center gap-2"
+                  className="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-extrabold text-xs shadow-glow hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   <Ticket className="w-4 h-4" />
                   <span>Get Official Passes (From ${spotlightConcert.price_min})</span>
@@ -283,7 +283,7 @@ export default function ConcertDashboard() {
 
                 <button
                   onClick={(e) => handlePlayAudio(e, spotlightConcert)}
-                  className="px-4 py-2.5 rounded-xl bg-stage-900 border border-stage-800 hover:border-cyan-500 text-cyan-400 font-bold text-xs transition-all flex items-center gap-2"
+                  className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-stage-900 border border-stage-800 hover:border-cyan-500 text-cyan-400 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
                   <Volume2 className="w-4 h-4" />
                   <span>Preview Audio Vibe</span>
@@ -292,16 +292,16 @@ export default function ConcertDashboard() {
             </div>
 
             {/* Quick Stats Pill Cards */}
-            <div className="grid grid-cols-2 gap-3 w-full md:w-auto shrink-0 text-xs">
-              <div className="p-4 rounded-2xl bg-stage-900/80 border border-stage-800 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Tickets Left</span>
-                <span className="text-xl font-black text-rose-400">{spotlightConcert.tickets_remaining_pct}%</span>
-                <span className="text-[10px] text-slate-500 block mt-0.5">Selling Fast</span>
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full md:w-auto shrink-0 text-xs">
+              <div className="p-3 sm:p-4 rounded-2xl bg-stage-900/80 border border-stage-800 text-center">
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Tickets Left</span>
+                <span className="text-lg sm:text-xl font-black text-rose-400">{spotlightConcert.tickets_remaining_pct}%</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-500 block mt-0.5">Selling Fast</span>
               </div>
-              <div className="p-4 rounded-2xl bg-stage-900/80 border border-stage-800 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Fans Going</span>
-                <span className="text-xl font-black text-purple-400">{spotlightConcert.rsvps_count}</span>
-                <span className="text-[10px] text-slate-500 block mt-0.5">Squad RSVPs</span>
+              <div className="p-3 sm:p-4 rounded-2xl bg-stage-900/80 border border-stage-800 text-center">
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Fans Going</span>
+                <span className="text-lg sm:text-xl font-black text-purple-400">{spotlightConcert.rsvps_count}</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-500 block mt-0.5">Squad RSVPs</span>
               </div>
             </div>
           </div>
@@ -318,24 +318,24 @@ export default function ConcertDashboard() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6">
         {/* Results Header */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5 sm:mb-4">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-extrabold text-lg text-white">
+            <h3 className="font-extrabold text-base sm:text-lg text-white">
               {showOnlySaved ? 'Your Saved Concerts' : 'Upcoming Live Tour Dates'}
             </h3>
             <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-stage-800 text-purple-300 border border-stage-700">
               {filteredConcerts.length} Shows
             </span>
             {isLiveApiActive && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Live Ticketmaster API
               </span>
             )}
             {isLoadingLive && (
-              <span className="text-xs text-slate-400 animate-pulse flex items-center gap-1 font-medium">
+              <span className="text-[11px] sm:text-xs text-slate-400 animate-pulse flex items-center gap-1 font-medium">
                 Syncing live concerts...
               </span>
             )}
@@ -353,11 +353,11 @@ export default function ConcertDashboard() {
 
         {/* Content Layout Modes */}
         {layoutMode === 'split' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
             {/* Left Column: Concerts List */}
             <div className="lg:col-span-7 xl:col-span-6 space-y-4">
               {filteredConcerts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                   {filteredConcerts.map((concert, index) => (
                     <ConcertCard
                       key={concert.id}
@@ -377,7 +377,7 @@ export default function ConcertDashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-16 px-4 rounded-3xl border border-dashed border-stage-800 space-y-3">
+                <div className="text-center py-12 sm:py-16 px-4 rounded-3xl border border-dashed border-stage-800 space-y-3">
                   <div className="w-12 h-12 rounded-full bg-purple-500/10 text-purple-400 mx-auto flex items-center justify-center">
                     <FilterX className="w-6 h-6" />
                   </div>
@@ -400,7 +400,7 @@ export default function ConcertDashboard() {
                       });
                       setShowOnlySaved(false);
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-md"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-md active:scale-95"
                   >
                     Reset All Filters
                   </button>
@@ -409,7 +409,7 @@ export default function ConcertDashboard() {
             </div>
 
             {/* Right Column: Sticky Interactive Venue Radar Map */}
-            <div className="lg:col-span-5 xl:col-span-6 lg:sticky lg:top-24 h-[420px] lg:h-[calc(100vh-140px)]">
+            <div className="lg:col-span-5 xl:col-span-6 lg:sticky lg:top-24 h-[350px] sm:h-[420px] lg:h-[calc(100vh-140px)]">
               <VenueMap
                 concerts={filteredConcerts}
                 selectedConcertId={selectedConcertId}
@@ -423,7 +423,7 @@ export default function ConcertDashboard() {
         {layoutMode === 'grid' && (
           <div>
             {filteredConcerts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-5">
                 {filteredConcerts.map((concert, index) => (
                   <ConcertCard
                     key={concert.id}
@@ -439,7 +439,7 @@ export default function ConcertDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-stage-800 space-y-3">
+              <div className="text-center py-16 sm:py-20 px-4 rounded-3xl border border-dashed border-stage-800 space-y-3">
                 <h4 className="font-bold text-white text-base">No matching concerts</h4>
                 <p className="text-xs text-slate-400">Try adjusting your filters.</p>
               </div>
@@ -448,7 +448,7 @@ export default function ConcertDashboard() {
         )}
 
         {layoutMode === 'map' && (
-          <div className="w-full h-[calc(100vh-180px)] min-h-[500px]">
+          <div className="w-full h-[calc(100vh-160px)] min-h-[380px] sm:min-h-[500px]">
             <VenueMap
               concerts={filteredConcerts}
               selectedConcertId={selectedConcertId}
@@ -510,9 +510,9 @@ export default function ConcertDashboard() {
         />
       )}
 
-      {/* Floating Toast Notification */}
+      {/* Floating Toast Notification (Positioned at top so it never clashes with bottom audio player) */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-stage-900/95 border border-purple-500/50 shadow-glow text-white text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed top-16 sm:top-20 left-1/2 -translate-x-1/2 z-[70] max-w-[92vw] px-4 py-2.5 rounded-2xl bg-stage-900/95 border border-purple-500/50 shadow-glow text-white text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-top-3 duration-200 text-center">
           {toastMessage}
         </div>
       )}

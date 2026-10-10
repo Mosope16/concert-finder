@@ -35,10 +35,10 @@ const GENRE_KEYS: GenreCategory[] = [
 
 const EVENT_TYPES: { id: EventType; label: string }[] = [
   { id: 'all', label: 'All Formats' },
-  { id: 'stadium-tour', label: '🏟️ Stadium Tour' },
-  { id: 'arena', label: '⚡ Arena Show' },
-  { id: 'festival', label: '🎪 Music Festival' },
-  { id: 'intimate-club', label: '🍸 Club / Warehouse' },
+  { id: 'stadium-tour', label: '🏟️ Stadium' },
+  { id: 'arena', label: '⚡ Arena' },
+  { id: 'festival', label: '🎪 Festival' },
+  { id: 'intimate-club', label: '🍸 Club' },
   { id: 'amphitheater', label: '🌲 Amphitheater' }
 ];
 
@@ -50,10 +50,10 @@ export default function FiltersBar({
   totalResultsCount
 }: FiltersBarProps) {
   return (
-    <div className="w-full border-b border-stage-800 bg-[#0c0d15] py-3 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto space-y-3">
+    <div className="w-full border-b border-stage-800 bg-[#0c0d15] py-2.5 sm:py-3 px-3 sm:px-6">
+      <div className="max-w-7xl mx-auto space-y-2.5 sm:space-y-3">
         {/* Top Row: Genre Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-touch pb-0.5">
           {GENRE_KEYS.map((genreKey) => {
             const meta = GENRE_METADATA[genreKey];
             const isActive = filters.genre === genreKey;
@@ -62,7 +62,7 @@ export default function FiltersBar({
               <button
                 key={genreKey}
                 onClick={() => onFilterChange({ genre: genreKey })}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all border ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold shrink-0 transition-all border active:scale-95 ${
                   isActive
                     ? 'bg-purple-600 text-white border-purple-400 shadow-glow'
                     : 'bg-stage-900 text-slate-300 border-stage-800 hover:border-stage-700 hover:text-white'
@@ -75,14 +75,14 @@ export default function FiltersBar({
         </div>
 
         {/* Bottom Row: Event Type, Price, Sort & Layout Switch */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs">
-          {/* Left: Event Type Buttons */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 text-xs">
+          {/* Left: Event Type Buttons - scrollable */}
+          <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar scroll-touch min-w-0 flex-1">
             {EVENT_TYPES.map((type) => (
               <button
                 key={type.id}
                 onClick={() => onFilterChange({ eventType: type.id })}
-                className={`px-2.5 py-1 rounded-lg font-medium shrink-0 transition-all border ${
+                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg font-medium shrink-0 transition-all border text-[11px] sm:text-xs active:scale-95 ${
                   filters.eventType === type.id
                     ? 'bg-stage-800 text-cyan-300 border-cyan-500/40'
                     : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200'
@@ -94,9 +94,9 @@ export default function FiltersBar({
           </div>
 
           {/* Right: Controls & Layout */}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Available Tickets Only Checkbox */}
-            <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 select-none hover:text-white">
+            <label className="hidden sm:flex items-center gap-1.5 cursor-pointer text-slate-300 select-none hover:text-white">
               <input
                 type="checkbox"
                 checked={filters.ticketStatus === 'available-only'}
@@ -107,13 +107,30 @@ export default function FiltersBar({
                 }
                 className="rounded bg-stage-900 border-stage-700 text-purple-600 focus:ring-0"
               />
-              <span className="hidden sm:inline">Tickets Available</span>
-              <Ticket className="w-3.5 h-3.5 text-purple-400 sm:hidden" />
+              <span className="hidden lg:inline">Tickets Available</span>
+              <Ticket className="w-3.5 h-3.5 text-purple-400 lg:hidden" />
             </label>
 
+            {/* Tickets Available toggle for mobile (icon-only) */}
+            <button
+              onClick={() =>
+                onFilterChange({
+                  ticketStatus: filters.ticketStatus === 'available-only' ? 'all' : 'available-only'
+                })
+              }
+              className={`sm:hidden p-1.5 rounded-lg border transition-all ${
+                filters.ticketStatus === 'available-only'
+                  ? 'bg-purple-600/20 border-purple-500/50 text-purple-300'
+                  : 'bg-stage-900 border-stage-800 text-slate-400'
+              }`}
+              title="Toggle available tickets"
+            >
+              <Ticket className="w-3.5 h-3.5" />
+            </button>
+
             {/* Sort Dropdown */}
-            <div className="flex items-center gap-1 bg-stage-900 border border-stage-800 rounded-lg px-2 py-1">
-              <span className="text-slate-400 hidden sm:inline">Sort:</span>
+            <div className="flex items-center gap-1 bg-stage-900 border border-stage-800 rounded-lg px-2 py-1 sm:py-1.5">
+              <span className="text-slate-400 hidden sm:inline text-[11px]">Sort:</span>
               <select
                 value={filters.sortBy}
                 onChange={(e) =>
@@ -121,43 +138,43 @@ export default function FiltersBar({
                     sortBy: e.target.value as FilterState['sortBy']
                   })
                 }
-                className="bg-transparent text-slate-200 focus:outline-none cursor-pointer"
+                className="bg-transparent text-[11px] sm:text-xs text-slate-200 focus:outline-none cursor-pointer max-w-[100px] sm:max-w-none"
               >
-                <option value="date" className="bg-stage-900">Upcoming Date</option>
-                <option value="price-low" className="bg-stage-900">Price: Low to High</option>
-                <option value="price-high" className="bg-stage-900">Price: High to Low</option>
-                <option value="popularity" className="bg-stage-900">Most Popular / RSVPs</option>
+                <option value="date" className="bg-stage-900">Upcoming</option>
+                <option value="price-low" className="bg-stage-900">Price ↑</option>
+                <option value="price-high" className="bg-stage-900">Price ↓</option>
+                <option value="popularity" className="bg-stage-900">Popular</option>
               </select>
             </div>
 
-            {/* Layout Mode Switch */}
-            <div className="hidden md:flex items-center bg-stage-900 border border-stage-800 rounded-lg p-0.5">
+            {/* Layout Mode Switch — visible on all screens */}
+            <div className="flex items-center bg-stage-900 border border-stage-800 rounded-lg p-0.5">
               <button
                 onClick={() => onLayoutChange('split')}
-                className={`p-1.5 rounded-md transition-colors ${
+                className={`p-1 sm:p-1.5 rounded-md transition-colors ${
                   layoutMode === 'split' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
                 title="Split View (Map + Shows)"
               >
-                <Columns className="w-3.5 h-3.5" />
+                <Columns className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => onLayoutChange('grid')}
-                className={`p-1.5 rounded-md transition-colors ${
+                className={`p-1 sm:p-1.5 rounded-md transition-colors ${
                   layoutMode === 'grid' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
                 title="Cards Grid"
               >
-                <LayoutGrid className="w-3.5 h-3.5" />
+                <LayoutGrid className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
               <button
                 onClick={() => onLayoutChange('map')}
-                className={`p-1.5 rounded-md transition-colors ${
+                className={`p-1 sm:p-1.5 rounded-md transition-colors ${
                   layoutMode === 'map' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
                 title="Full Screen Map Radar"
               >
-                <MapIcon className="w-3.5 h-3.5" />
+                <MapIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
           </div>
