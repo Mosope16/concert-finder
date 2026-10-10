@@ -97,11 +97,13 @@ export async function fetchTicketmasterConcerts(
   }
 
   try {
+    const nowIso = new Date().toISOString().split('.')[0] + 'Z';
     const params = new URLSearchParams({
       apikey: TICKETMASTER_API_KEY,
       classificationName: 'music',
       sort: 'date,asc',
-      size: '24'
+      size: '30',
+      startDateTime: nowIso
     });
 
     if (city && city !== 'all') {
@@ -130,8 +132,23 @@ export async function fetchTicketmasterConcerts(
       return [];
     }
 
+    const nowMs = Date.now();
+
     return rawEvents
-      .filter((ev) => ev._embedded?.venues?.[0]?.location?.latitude)
+      .filter((ev) => {
+        // Must have venue location for the interactive map
+        if (!ev._embedded?.venues?.[0]?.location?.latitude) return false;
+
+        // Must be an upcoming/future date
+        const dateIso =
+          ev.dates?.start?.dateTime ||
+          (ev.dates?.start?.localDate
+            ? `${ev.dates.start.localDate}T${ev.dates.start.localTime || '19:00:00'}Z`
+            : null);
+        if (!dateIso) return false;
+        const eventTime = new Date(dateIso).getTime();
+        return !isNaN(eventTime) && eventTime >= nowMs;
+      })
       .map((ev, index) => {
         const venue = ev._embedded?.venues?.[0];
         const attractions = ev._embedded?.attractions || [];
