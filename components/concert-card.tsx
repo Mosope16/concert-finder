@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { ConcertEvent } from '@/lib/types';
 import { GENRE_METADATA, TICKET_STATUS_META } from '@/lib/constants';
@@ -9,14 +9,10 @@ import {
   MapPin,
   Heart,
   Volume2,
-  VolumeX,
   Users,
-  Sparkles,
-  Ticket,
   ChevronRight,
   Flame
 } from 'lucide-react';
-import { soundEngine } from '@/lib/audio';
 
 interface ConcertCardProps {
   concert: ConcertEvent;
@@ -41,12 +37,6 @@ export default function ConcertCard({
   onPlayAudio,
   onFocusOnMap
 }: ConcertCardProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const genreMeta = GENRE_METADATA[concert.genre] || GENRE_METADATA.all;
   const ticketMeta = TICKET_STATUS_META[concert.ticket_status];
 
@@ -59,10 +49,10 @@ export default function ConcertCard({
   return (
     <div
       onClick={() => onSelect(concert)}
-      className={`group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border flex flex-col justify-between active:scale-[0.98] ${
+      className={`card-virtualized group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer border flex flex-col justify-between active:scale-[0.99] transition-[border-color,box-shadow] duration-200 ${
         isSelected
           ? 'bg-stage-900 border-purple-500 shadow-glow ring-2 ring-purple-500/30'
-          : 'bg-stage-900/90 border-stage-800 hover:border-stage-700 hover:shadow-card hover:-translate-y-0.5'
+          : 'bg-stage-900/95 border-stage-800 hover:border-stage-700 hover:shadow-card'
       }`}
     >
       {/* Header Visual & Badges */}
@@ -72,13 +62,14 @@ export default function ConcertCard({
           alt={concert.artist}
           fill
           priority={priority}
+          loading={priority ? 'eager' : 'lazy'}
           sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
+          className="object-cover sm:group-hover:scale-105 transition-transform duration-500 will-change-transform"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-stage-900 via-stage-900/30 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-stage-900 via-stage-900/30 to-black/60 pointer-events-none" />
 
         {/* Date Calendar Badge (Top Left) */}
-        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col items-center justify-center w-10 h-11 sm:w-12 sm:h-13 rounded-lg sm:rounded-xl bg-black/70 backdrop-blur-md border border-white/15 text-center shadow-lg">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col items-center justify-center w-10 h-11 sm:w-12 sm:h-13 rounded-lg sm:rounded-xl bg-black/85 border border-white/15 text-center shadow-md">
           <span className="text-[9px] sm:text-[10px] font-black text-purple-400 tracking-wider">
             {monthStr}
           </span>
@@ -95,18 +86,19 @@ export default function ConcertCard({
           {/* Sound Preview Button */}
           <button
             onClick={(e) => onPlayAudio(e, concert)}
-            className={`p-1.5 sm:p-2 rounded-full backdrop-blur-md border transition-all active:scale-90 ${
+            className={`p-1.5 sm:p-2 rounded-full border transition-transform active:scale-90 ${
               isPlayingAudio
-                ? 'bg-cyan-500 text-black border-cyan-300 shadow-glow-cyan animate-pulse'
-                : 'bg-black/60 text-cyan-400 border-cyan-500/30 hover:bg-black/80'
+                ? 'bg-cyan-500 text-black border-cyan-300 shadow-glow-cyan'
+                : 'bg-black/80 text-cyan-400 border-cyan-500/30 hover:bg-black'
             }`}
             title={isPlayingAudio ? 'Stop Sound Preview' : 'Play Live Synth Vibe'}
+            aria-label="Play sound preview"
           >
             {isPlayingAudio ? (
               <div className="flex items-center gap-0.5 h-3 sm:h-3.5 px-0.5">
-                <span className="w-0.5 bg-black animate-soundwave-1" />
-                <span className="w-0.5 bg-black animate-soundwave-2" />
-                <span className="w-0.5 bg-black animate-soundwave-3" />
+                <span className="w-0.5 h-3 bg-black animate-soundwave-1" />
+                <span className="w-0.5 h-3 bg-black animate-soundwave-2" />
+                <span className="w-0.5 h-3 bg-black animate-soundwave-3" />
               </div>
             ) : (
               <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -116,21 +108,22 @@ export default function ConcertCard({
           {/* Bookmark Button */}
           <button
             onClick={(e) => onToggleSave(e, concert.id)}
-            className="p-1.5 sm:p-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-black/80 transition-all active:scale-90"
+            className="p-1.5 sm:p-2 rounded-full bg-black/80 border border-white/15 text-white hover:bg-black transition-transform active:scale-90"
             title={isSaved ? 'Remove from saved' : 'Save concert'}
+            aria-label="Save concert"
           >
             <Heart className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSaved ? 'fill-rose-500 text-rose-500' : 'text-slate-200'}`} />
           </button>
         </div>
 
         {/* Bottom Banner Info: Genre & Ticket Status */}
-        <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-center justify-between gap-1.5 sm:gap-2">
+        <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-center justify-between gap-1.5 sm:gap-2 pointer-events-none">
           <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
-            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border backdrop-blur-md shrink-0 ${genreMeta.bgClass} ${genreMeta.borderClass}`}>
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border shrink-0 bg-black/85 ${genreMeta.borderClass} ${genreMeta.bgClass.replace(/bg-[^ ]+/, '')}`}>
               {genreMeta.label}
             </span>
             {concert.deal_rating === 'great-deal' && (
-              <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 backdrop-blur-md flex items-center gap-0.5 shrink-0">
+              <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 bg-black/85 flex items-center gap-0.5 shrink-0">
                 <Flame className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-amber-400" />
                 <span className="hidden xs:inline">Great Value</span>
               </span>
@@ -138,10 +131,10 @@ export default function ConcertCard({
           </div>
 
           {/* Ticket Status Pill */}
-          <div className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border backdrop-blur-md flex items-center gap-1 sm:gap-1.5 shrink-0 ${ticketMeta.badgeClass}`}>
+          <div className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border flex items-center gap-1 sm:gap-1.5 shrink-0 bg-black/85 ${ticketMeta.badgeClass}`}>
             <span
-              className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full animate-ping"
-              style={{ backgroundColor: ticketMeta.dotColor }}
+              className="w-1.5 h-1.5 rounded-full shrink-0 shadow-[0_0_6px_currentColor]"
+              style={{ backgroundColor: ticketMeta.dotColor, color: ticketMeta.dotColor }}
             />
             <span>{ticketMeta.label}</span>
           </div>
@@ -188,7 +181,7 @@ export default function ConcertCard({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="hidden xs:flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400" title="Students & Fans RSVP'd">
+            <div className="hidden xs:flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400" title="Fans RSVP'd">
               <Users className="w-3 h-3 text-purple-400" />
               <span>{concert.rsvps_count}</span>
             </div>

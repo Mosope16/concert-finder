@@ -31,7 +31,9 @@ import {
   ChevronRight,
   FilterX,
   Volume2,
-  Users
+  Users,
+  Map as MapIcon,
+  List
 } from 'lucide-react';
 
 const VenueMap = dynamic(() => import('@/components/map/venue-map'), {
@@ -255,7 +257,6 @@ export default function ConcertDashboard() {
       {/* Hero Tour Spotlight Banner */}
       {spotlightConcert && !showOnlySaved && !filters.searchQuery && (
         <section className="relative w-full border-b border-stage-800 bg-gradient-to-b from-[#131524] to-[#090a10] overflow-hidden py-6 sm:py-8 px-3.5 sm:px-6">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(192,132,252,0.15),transparent_50%)] pointer-events-none" />
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 relative z-10">
             <div className="space-y-2.5 sm:space-y-3 max-w-xl text-center md:text-left">
               <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/30">
@@ -275,7 +276,7 @@ export default function ConcertDashboard() {
               <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-2">
                 <button
                   onClick={() => handleSelectConcert(spotlightConcert)}
-                  className="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-extrabold text-xs shadow-glow hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-extrabold text-xs shadow-glow hover:brightness-110 transition-transform active:scale-95 flex items-center justify-center gap-2"
                 >
                   <Ticket className="w-4 h-4" />
                   <span>Get Official Passes (From ${spotlightConcert.price_min})</span>
@@ -283,7 +284,7 @@ export default function ConcertDashboard() {
 
                 <button
                   onClick={(e) => handlePlayAudio(e, spotlightConcert)}
-                  className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-stage-900 border border-stage-800 hover:border-cyan-500 text-cyan-400 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-stage-900 border border-stage-800 hover:border-cyan-500 text-cyan-400 font-bold text-xs transition-colors flex items-center justify-center gap-2 active:scale-95"
                 >
                   <Volume2 className="w-4 h-4" />
                   <span>Preview Audio Vibe</span>
@@ -318,7 +319,7 @@ export default function ConcertDashboard() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 pb-20 sm:pb-6">
         {/* Results Header */}
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5 sm:mb-4">
           <div className="flex flex-wrap items-center gap-2">
@@ -330,7 +331,7 @@ export default function ConcertDashboard() {
             </span>
             {isLiveApiActive && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 Live Ticketmaster API
               </span>
             )}
@@ -372,6 +373,9 @@ export default function ConcertDashboard() {
                       onFocusOnMap={(e) => {
                         e.stopPropagation();
                         setSelectedConcertId(concert.id);
+                        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                          setLayoutMode('map');
+                        }
                       }}
                     />
                   ))}
@@ -408,8 +412,8 @@ export default function ConcertDashboard() {
               )}
             </div>
 
-            {/* Right Column: Sticky Interactive Venue Radar Map */}
-            <div className="lg:col-span-5 xl:col-span-6 lg:sticky lg:top-24 h-[350px] sm:h-[420px] lg:h-[calc(100vh-140px)]">
+            {/* Right Column: Sticky Interactive Venue Radar Map (Rendered on desktop in split mode) */}
+            <div className="hidden lg:block lg:col-span-5 xl:col-span-6 lg:sticky lg:top-24 h-[calc(100vh-140px)]">
               <VenueMap
                 concerts={filteredConcerts}
                 selectedConcertId={selectedConcertId}
@@ -448,7 +452,7 @@ export default function ConcertDashboard() {
         )}
 
         {layoutMode === 'map' && (
-          <div className="w-full h-[calc(100vh-160px)] min-h-[380px] sm:min-h-[500px]">
+          <div className="w-full h-[calc(100vh-180px)] min-h-[420px]">
             <VenueMap
               concerts={filteredConcerts}
               selectedConcertId={selectedConcertId}
@@ -458,6 +462,26 @@ export default function ConcertDashboard() {
           </div>
         )}
       </main>
+
+      {/* Floating Mobile View Toggle (Pill button for phones: easily toggle between smooth list and full interactive map) */}
+      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+        <button
+          onClick={() => setLayoutMode(layoutMode === 'map' ? 'split' : 'map')}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-purple-600/95 hover:bg-purple-500 text-white font-extrabold text-xs shadow-glow border border-purple-400/50 active:scale-95 transition-transform"
+        >
+          {layoutMode === 'map' ? (
+            <>
+              <List className="w-4 h-4 text-purple-200" />
+              <span>Show Shows List</span>
+            </>
+          ) : (
+            <>
+              <MapIcon className="w-4 h-4 text-purple-200" />
+              <span>Show Radar Map</span>
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Floating Audio Preview Player */}
       <AudioPreviewPlayer
@@ -510,9 +534,9 @@ export default function ConcertDashboard() {
         />
       )}
 
-      {/* Floating Toast Notification (Positioned at top so it never clashes with bottom audio player) */}
+      {/* Floating Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-16 sm:top-20 left-1/2 -translate-x-1/2 z-[70] max-w-[92vw] px-4 py-2.5 rounded-2xl bg-stage-900/95 border border-purple-500/50 shadow-glow text-white text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-top-3 duration-200 text-center">
+        <div className="fixed top-16 sm:top-20 left-1/2 -translate-x-1/2 z-[70] max-w-[92vw] px-4 py-2.5 rounded-2xl bg-stage-900 border border-purple-500/50 shadow-glow text-white text-xs font-semibold animate-in fade-in slide-in-from-top-3 duration-200 text-center">
           {toastMessage}
         </div>
       )}
