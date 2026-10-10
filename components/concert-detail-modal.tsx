@@ -329,13 +329,26 @@ export default function ConcertDetailModal({
                 </span>
               </div>
 
-              <button
-                onClick={handleBuyPass}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:brightness-110 text-white font-extrabold text-xs shadow-lg transition-all active:scale-95 flex items-center gap-2"
-              >
-                <Ticket className="w-4 h-4" />
-                <span>{ticketPurchased ? 'Pass Confirmed ✓' : 'Reserve Official Pass'}</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {concert.ticket_url && (
+                  <a
+                    href={concert.ticket_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5"
+                    title="Open official Ticketmaster listing"
+                  >
+                    <span>Ticketmaster ↗</span>
+                  </a>
+                )}
+                <button
+                  onClick={handleBuyPass}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:brightness-110 text-white font-extrabold text-xs shadow-lg transition-all active:scale-95 flex items-center gap-2"
+                >
+                  <Ticket className="w-4 h-4" />
+                  <span>{ticketPurchased ? 'Pass Confirmed ✓' : 'Reserve Official Pass'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Simulated Digital Ticket Badge on Purchase */}

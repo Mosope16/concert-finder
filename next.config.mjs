@@ -13,6 +13,14 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "i.scdn.co"
+      },
+      {
+        protocol: "https",
+        hostname: "s1.ticketm.net"
+      },
+      {
+        protocol: "https",
+        hostname: "media.ticketmaster.com"
       }
     ]
   }

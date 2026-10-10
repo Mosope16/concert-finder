@@ -68,6 +68,7 @@ export interface ConcertEvent {
   is_featured: boolean;
   ticket_tiers: TicketTier[];
   deal_rating: 'great-deal' | 'fair-price' | 'vip-tier';
+  ticket_url?: string;
 }
 
 export interface UserRSVP {

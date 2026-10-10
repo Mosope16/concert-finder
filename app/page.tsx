@@ -11,6 +11,8 @@ import {
 } from '@/lib/storage';
 import { soundEngine } from '@/lib/audio';
 
+import { fetchTicketmasterConcerts } from '@/lib/ticketmaster';
+
 import Navbar from '@/components/navbar';
 import FiltersBar from '@/components/filters-bar';
 import ConcertCard from '@/components/concert-card';
@@ -62,16 +64,33 @@ export default function ConcertDashboard() {
   const [currentAudioTrack, setCurrentAudioTrack] = useState<string | null>(null);
   const [currentAudioArtist, setCurrentAudioArtist] = useState<string | undefined>(undefined);
 
+  // Ticketmaster Live API State
+  const [isLiveApiActive, setIsLiveApiActive] = useState(false);
+  const [isLoadingLive, setIsLoadingLive] = useState(false);
+
+  // Live Tour Data Fetcher (Ticketmaster Discovery API)
+  const loadTicketmasterEvents = React.useCallback(async (city: string, query: string) => {
+    if (!process.env.NEXT_PUBLIC_TICKETMASTER_API_KEY) return;
+    setIsLoadingLive(true);
+    try {
+      const liveEvents = await fetchTicketmasterConcerts(city, query);
+      if (liveEvents && liveEvents.length > 0) {
+        setConcerts(liveEvents);
+        setIsLiveApiActive(true);
+        setSelectedConcertId(liveEvents[0].id);
+      }
+    } catch (err) {
+      console.warn('Ticketmaster load error, using stored concerts:', err);
+    } finally {
+      setIsLoadingLive(false);
+    }
+  }, []);
+
   // Hydration sync
   useEffect(() => {
     setConcerts(getStoredConcerts());
     setSavedIds(getSavedConcertIds());
   }, []);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3200);
-  };
 
   // Filter State
   const [filters, setFilters] = useState<FilterState>({
@@ -84,6 +103,20 @@ export default function ConcertDashboard() {
     timeRange: 'all',
     sortBy: 'date'
   });
+
+  // Live Tour Data sync whenever city or search query changes
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_TICKETMASTER_API_KEY) return;
+    const timer = setTimeout(() => {
+      loadTicketmasterEvents(filters.city, filters.searchQuery);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [filters.city, filters.searchQuery, loadTicketmasterEvents]);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3200);
+  };
 
   const handleFilterUpdate = (newFilters: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -287,14 +320,25 @@ export default function ConcertDashboard() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
         {/* Results Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-extrabold text-lg text-white">
               {showOnlySaved ? 'Your Saved Concerts' : 'Upcoming Live Tour Dates'}
             </h3>
             <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-stage-800 text-purple-300 border border-stage-700">
               {filteredConcerts.length} Shows
             </span>
+            {isLiveApiActive && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Live Ticketmaster API
+              </span>
+            )}
+            {isLoadingLive && (
+              <span className="text-xs text-slate-400 animate-pulse flex items-center gap-1 font-medium">
+                Syncing live concerts...
+              </span>
+            )}
           </div>
 
           {showOnlySaved && (
