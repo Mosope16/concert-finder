@@ -5,7 +5,23 @@ import ServiceWorkerRegistration from '@/components/service-worker-registration'
 export const metadata: Metadata = {
   title: 'Concert Finder | Live Tour Radar & Festival Guide',
   description: 'Discover live concerts, festival stages, setlists, and ticket alerts with interactive venue radar maps and audio previews.',
-  keywords: ['concerts', 'live music', 'tour dates', 'festivals', 'tickets', 'venues', 'setlists']
+  keywords: ['concerts', 'live music', 'tour dates', 'festivals', 'tickets', 'venues', 'setlists'],
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  appleWebApp: {
+    title: 'Concert Finder',
+    statusBarStyle: 'black-translucent',
+  },
 };
 
 export default function RootLayout({

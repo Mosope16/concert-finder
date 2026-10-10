@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="cf-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18152e" />
+      <stop offset="50%" stop-color="#0d0e19" />
+      <stop offset="100%" stop-color="#06070c" />
+    </linearGradient>
+
+    <!-- Border Glow Gradient -->
+    <linearGradient id="cf-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+
+    <!-- Vibrant Note Gradient -->
+    <linearGradient id="cf-music" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="45%" stop-color="#ec4899" />
+      <stop offset="85%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+
+    <!-- Cyan Pulse Gradient -->
+    <linearGradient id="cf-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67e8f9" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+
+    <filter id="cf-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="14" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="cyan-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Base Frame -->
+  <rect x="24" y="24" width="464" height="464" rx="116" fill="url(#cf-bg)" stroke="url(#cf-border)" stroke-width="8" />
+
+  <!-- Ambient Radar Stage Waves -->
+  <circle cx="256" cy="256" r="195" fill="none" stroke="#a855f7" stroke-width="3" stroke-opacity="0.18" stroke-dasharray="14 10" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ec4899" stroke-width="3" stroke-opacity="0.25" stroke-dasharray="20 14" />
+  <circle cx="256" cy="256" r="105" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-opacity="0.22" stroke-dasharray="10 8" />
+
+  <!-- Concert Music Note Symbol with Glow Filter -->
+  <g filter="url(#cf-glow)">
+    <!-- Connecting Top Beam -->
+    <path d="M192 124 L396 74 L396 122 L192 172 Z" fill="url(#cf-music)" />
+
+    <!-- Left Note Stem -->
+    <rect x="192" y="124" width="28" height="236" rx="6" fill="url(#cf-music)" />
+
+    <!-- Right Note Stem -->
+    <rect x="368" y="74" width="28" height="236" rx="6" fill="url(#cf-music)" />
+
+    <!-- Left Note Head (Rotated Oval) -->
+    <ellipse cx="166" cy="360" rx="54" ry="42" transform="rotate(-22 166 360)" fill="url(#cf-music)" />
+
+    <!-- Right Note Head (Rotated Oval) -->
+    <ellipse cx="342" cy="310" rx="54" ry="42" transform="rotate(-22 342 310)" fill="url(#cf-music)" />
+  </g>
+
+  <!-- High-Energy Radar Live Beacon (Top Right) -->
+  <g filter="url(#cyan-glow)">
+    <circle cx="396" cy="74" r="32" fill="none" stroke="#22d3ee" stroke-width="4" stroke-opacity="0.5" />
+    <circle cx="396" cy="74" r="18" fill="url(#cf-cyan)" />
+    <circle cx="396" cy="74" r="7" fill="#ffffff" />
+  </g>
+
+  <!-- Dynamic Equalizer Bars at Base -->
+  <g opacity="0.85">
+    <rect x="236" y="380" width="8" height="26" rx="4" fill="#a855f7" />
+    <rect x="252" y="366" width="8" height="40" rx="4" fill="#ec4899" />
+    <rect x="268" y="374" width="8" height="32" rx="4" fill="#f59e0b" />
+    <rect x="284" y="382" width="8" height="24" rx="4" fill="#06b6d4" />
+  </g>
+</svg>
